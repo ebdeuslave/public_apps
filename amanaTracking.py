@@ -1,7 +1,11 @@
-from bs4 import BeautifulSoup as bs
+import subprocess, sys, importlib
 from urllib.request import urlopen , Request
 import json, webbrowser
 from tkinter import *
+# Check if module installed if not run pip to install it
+if not importlib.util.find_spec('bs4'):
+	subprocess.check_call([sys.executable, '-m', 'pip' , 'install', 'bs4'])
+from bs4 import BeautifulSoup as bs
 
 app = Tk()
 app.title('Amana Tracking')
