@@ -22,47 +22,52 @@ menu.add_cascade(label='Created by', menu=created)
 created.add_command(label='@ebdeuslave' , command=creator)
 
 def tracking():
-	result = ''
-	link = 'https://bam-tracking.barid.ma/Tracking/Search?trackingCode=' + inputCAB.get()
-	### read html ###
-	req = Request(link,headers={'User-Agent': 'Mozilla/5.0'})
-	openLink = urlopen(req).read()
-	soup = bs(openLink, 'lxml')
-	### convert to JSON ###
-	json_data = json.loads(openLink)
-	### Soup HTML text from JSON ###
-	soup = bs(json_data['Html'], 'lxml')
-	### Get Data ###
-	notFound = soup.find('h5', {'class':'text-orange mt-5 text-uppercase'})
-	if notFound != None and 'Aucune information':
-		result = 'Code Amana est introuvable'
-		resultLabel.config(text=result)
+	try: 
 
-	else:
-		city = soup.find('div', {'class':'tooltip_depart margin3 lblRecipient'}).text
-		mt = soup.find('span', {'class':'b-subtitle lblMttCrbt'}).text
-		date_livraison = soup.find('span', {'class':'b-subtitle text-uppercase'}).text
-		if date_livraison == '../../....':
-			date_livraison = 'Non Livré'
+		result = ''
+		link = 'https://bam-tracking.barid.ma/Tracking/Search?trackingCode=' + inputCAB.get()
+		### read html ###
+		req = Request(link,headers={'User-Agent': 'Mozilla/5.0'})
+		openLink = urlopen(req).read()
+		soup = bs(openLink, 'lxml')
+		### convert to JSON ###
+		json_data = json.loads(openLink)
+		### Soup HTML text from JSON ###
+		soup = bs(json_data['Html'], 'lxml')
+		### Get Data ###
+		notFound = soup.find('h5', {'class':'text-orange mt-5 text-uppercase'})
+		if notFound != None and 'Aucune information':
+			result = 'Code Amana est introuvable'
+			resultLabel.config(text=result)
 
-		ul = soup.find('ul', {'class':'timeline'})
-		bullet = ul.find_all('div',{'class': 'bullet'})
-		dates = ul.find_all('div',{'class': 'container_date'})
-		msgs = ul.find_all('div',{'class': 'mt-3 mb-5'})
+		else:
+			city = soup.find('div', {'class':'tooltip_depart margin3 lblRecipient'}).text
+			mt = soup.find('span', {'class':'b-subtitle lblMttCrbt'}).text
+			date_livraison = soup.find('span', {'class':'b-subtitle text-uppercase'}).text
+			if date_livraison == '../../....':
+				date_livraison = 'Non Livré'
 
-		result += f'''
+			ul = soup.find('ul', {'class':'timeline'})
+			bullet = ul.find_all('div',{'class': 'bullet'})
+			dates = ul.find_all('div',{'class': 'container_date'})
+			msgs = ul.find_all('div',{'class': 'mt-3 mb-5'})
+
+			result += f'''
 CAB : {inputCAB.get()}
 Ville : {city}
 Montant : {mt}
 Date de livraison : {date_livraison}
-		'''
+			'''
 
-		for x,y,z in zip(bullet, dates, msgs):
-			result += f'\n############ {x.text.strip()} ############\n'
-			result += y.text.strip() + '\n'
-			result += z.text.strip()[6:] + '\n'
-			resultLabel.config(text=result)
-		print(result)
+			for x,y,z in zip(bullet, dates, msgs):
+				result += f'\n############ {x.text.strip()} ############\n'
+				result += y.text.strip() + '\n'
+				result += z.text.strip()[6:] + '\n'
+				resultLabel.config(text=result)
+			print(result)
+	except Exception as e:
+		print(e)
+		resultLabel.config(text=f'Erreur :\n{e}')
 	
 formCAB = Label(app, text='Donnez moi un CAB : ').pack(pady=20)
 inputCAB = Entry()
