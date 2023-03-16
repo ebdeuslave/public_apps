@@ -1,3 +1,6 @@
+# on google colab make runtime type to GPU
+# !pip install --upgrade keras-cv
+
 # Model
 from tensorflow import keras
 import keras_cv
